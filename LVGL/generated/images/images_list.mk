@@ -1,0 +1,1 @@
+GEN_CSRCS += _F5_20x20.c _back_240x320.c _back_20x20.c _off_240x320.c _off_20x20.c

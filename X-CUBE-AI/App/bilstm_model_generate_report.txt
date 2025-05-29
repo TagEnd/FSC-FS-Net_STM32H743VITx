@@ -1,0 +1,237 @@
+Neural Network Tools for STM32 family v1.7.0 (stm.ai v8.1.0-19520)
+Created date          : 2024-09-04 16:24:30
+Parameters            : generate --name bilstm_model -m E:/Code/stm32/Research/CollectDeviceV3/models/my_model.h5 --type keras --compression none --verbosity 1 --workspace C:\Users\17832\AppData\Local\Temp\mxAI_workspace276420688031006265705901997707733 --output C:\Users\17832\.stm32cubemx\network_output --allocate-inputs --series stm32h7 --allocate-outputs
+
+Exec/report summary (generate)
+-----------------------------------------------------------------------------------------------------------
+model file         :   E:\Code\stm32\Research\CollectDeviceV3\models\my_model.h5                           
+type               :   keras                                                                               
+c_name             :   bilstm_model                                                                        
+compression        :   none                                                                                
+options            :   allocate-inputs, allocate-outputs                                                   
+optimization       :   balanced                                                                            
+target/series      :   stm32h7                                                                             
+workspace dir      :   C:\Users\17832\AppData\Local\Temp\mxAI_workspace276420688031006265705901997707733   
+output dir         :   C:\Users\17832\.stm32cubemx\network_output                                          
+model_fmt          :   float                                                                               
+model_name         :   my_model                                                                            
+model_hash         :   e3ce3a8f8afd1f23026084230cb93e46                                                    
+params #           :   217,113 items (848.10 KiB)                                                          
+-----------------------------------------------------------------------------------------------------------
+input 1/1          :   'input_0' (domain:activations/**default**)                                          
+                   :   4096 items, 16.00 KiB, ai_float, float, (1,1,4096)                                  
+output 1/1         :   'dense_1_dense' (domain:activations/**default**)                                    
+                   :   9 items, 36 B, ai_float, float, (1,9)                                               
+macc               :   582,293                                                                             
+weights (ro)       :   869,388 B (849.01 KiB) (1 segment) / +936(+0.1%) vs float model                     
+activations (rw)   :   16,416 B (16.03 KiB) (1 segment) *                                                  
+ram (total)        :   16,416 B (16.03 KiB) = 16,416 + 0 + 0                                               
+-----------------------------------------------------------------------------------------------------------
+(*) 'input'/'output' buffers can be used from the activations buffer
+
+Model name - my_model ['input_0'] ['dense_1_dense']
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+m_id   layer (type,original)                     oshape                    param/size             macc      connected to   | c_size              c_macc              c_type                                     
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+0      input_0 (Input, None)                     [b:None,h:1,h:1,c:4096]                                                   | +131,104(+100.0%)   +32,776(+100.0%)    conv2d_of32[0]                             
+       conv1d_conv2d (Conv2D, Conv1D)            [b:None,h:1,h:1,c:8]      32,776/131,104       32,776           input_0   | -131,104(-100.0%)   -32,776(-100.0%)    
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+1      permute (Transpose, Permute)              [b:None,h:8,h:8,c:1]                                4     conv1d_conv2d   |                                         transpose_of32[1]                          
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+2      forward_lstm (LSTM, Bidirectional)        [b:None,h:8,h:8,c:16]     1,154/4,616           9,344           permute   | +5,000(+108.3%)     +9,344(+100.0%)     lstm_of32/lstm_of32/concat_of32[2, 3, 4]   
+       backward_lstm (LSTM, Bidirectional)       [b:None,h:8,h:8,c:16]     1,154/4,616           9,344           permute   | -4,616(-100.0%)     -9,344(-100.0%)     
+       bidirectional (Concat, Bidirectional)     [b:None,h:8,h:8,c:32]                                      forward_lstm   |                                         
+                                                                                                           backward_lstm   | 
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+3      forward_lstm_1 (LSTM, Bidirectional)      [b:None,h:8,h:8,c:64]     24,834/99,336       199,168     bidirectional   | +100,872(+101.5%)   +199,168(+100.0%)   lstm_of32/lstm_of32/concat_of32[5, 6, 7]   
+       backward_lstm_1 (LSTM, Bidirectional)     [b:None,h:8,h:8,c:64]     24,834/99,336       199,168     bidirectional   | -99,336(-100.0%)    -199,168(-100.0%)   
+       bidirectional_1 (Concat, Bidirectional)   [b:None,h:8,h:8,c:128]                                   forward_lstm_1   |                                         
+                                                                                                         backward_lstm_1   | 
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+4      flatten (Reshape, Flatten)                [b:None,c:1024]                                         bidirectional_1   |                                         
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+5      dense_dense (Dense, Dense)                [b:None,c:128]            131,200/524,800     131,200           flatten   |                                         dense_of32[8]                              
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+6      re_lu (Nonlinearity, ReLU)                [b:None,c:128]                                    128       dense_dense   |                                         nl_of32[9]                                 
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+7      dense_1_dense (Dense, Dense)              [b:None,c:9]              1,161/4,644           1,161             re_lu   |                                         dense_of32[o][10]                          
+------ ----------------------------------------- ------------------------- ----------------- --------- ----------------- --- ------------------- ------------------- ------------------------------------------ 
+model/c-model: macc=582,293/582,293  weights=868,452/869,388 +936(+0.1%) activations=--/16,416 io=--/0
+
+
+
+Generated C-graph summary
+------------------------------------------------------------------------------------------------------------------------
+model name            : my_model
+c-name                : bilstm_model
+c-node #              : 11
+c-array #             : 37
+activations size      : 16416 (1 segment)
+weights size          : 869388 (1 segment)
+macc                  : 582293
+inputs                : ['input_0_output']
+outputs               : ['dense_1_dense_output']
+
+C-Arrays (37)
+------ -------------------------------- --------------- ------------------------- ------------- --------- --------- 
+c_id   name (*_array)                   item/size       domain/mem-pool           c-type        fmt       comment   
+------ -------------------------------- --------------- ------------------------- ------------- --------- --------- 
+0      re_lu_output                     128/512         activations/**default**   float         float32             
+1      dense_1_dense_output             9/36            activations/**default**   float         float32   /output   
+2      conv1d_conv2d_weights            32768/131072    weights/weights           const float   float32             
+3      conv1d_conv2d_bias               8/32            weights/weights           const float   float32             
+4      backward_lstm_kernel             64/256          weights/weights           const float   float32             
+5      backward_lstm_recurrent          1024/4096       weights/weights           const float   float32             
+6      backward_lstm_peephole           48/192          weights/weights           const float   float32             
+7      backward_lstm_bias               64/256          weights/weights           const float   float32             
+8      backward_lstm_recurrent_params   2/8             weights/weights           const float   float32             
+9      forward_lstm_kernel              64/256          weights/weights           const float   float32             
+10     forward_lstm_recurrent           1024/4096       weights/weights           const float   float32             
+11     forward_lstm_bias                64/256          weights/weights           const float   float32             
+12     backward_lstm_1_kernel           8192/32768      weights/weights           const float   float32             
+13     backward_lstm_1_recurrent        16384/65536     weights/weights           const float   float32             
+14     backward_lstm_1_peephole         192/768         weights/weights           const float   float32             
+15     backward_lstm_1_bias             256/1024        weights/weights           const float   float32             
+16     forward_lstm_1_kernel            8192/32768      weights/weights           const float   float32             
+17     forward_lstm_1_recurrent         16384/65536     weights/weights           const float   float32             
+18     forward_lstm_1_bias              256/1024        weights/weights           const float   float32             
+19     dense_dense_weights              131072/524288   weights/weights           const float   float32             
+20     dense_dense_bias                 128/512         weights/weights           const float   float32             
+21     dense_1_dense_weights            1152/4608       weights/weights           const float   float32             
+22     dense_1_dense_bias               9/36            weights/weights           const float   float32             
+23     backward_lstm_scratch0           112/448         activations/**default**   float         float32             
+24     forward_lstm_scratch0            112/448         activations/**default**   float         float32             
+25     backward_lstm_1_scratch0         448/1792        activations/**default**   float         float32             
+26     input_0_output                   4096/16384      activations/**default**   float         float32   /input    
+27     conv1d_conv2d_output             8/32            activations/**default**   float         float32             
+28     forward_lstm_1_scratch0          448/1792        activations/**default**   float         float32             
+29     permute_output                   8/32            activations/**default**   float         float32             
+30     backward_lstm_output0            128/512         activations/**default**   float         float32             
+31     forward_lstm_output0             128/512         activations/**default**   float         float32             
+32     bidirectional_output             256/1024        activations/**default**   float         float32             
+33     backward_lstm_1_output0          512/2048        activations/**default**   float         float32             
+34     forward_lstm_1_output0           512/2048        activations/**default**   float         float32             
+35     bidirectional_1_output           1024/4096       activations/**default**   float         float32             
+36     dense_dense_output               128/512         activations/**default**   float         float32             
+------ -------------------------------- --------------- ------------------------- ------------- --------- --------- 
+
+C-Layers (11)
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+c_id   name (*_layer)    id   layer_type   macc     rom      tensors                             shape (array id)   
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+0      conv1d_conv2d     0    conv2d       32776    131104   I: input_0_output                   (1,1,4096) (26)    
+                                                             W: conv1d_conv2d_weights            (4096,1,1,8) (2)   
+                                                             W: conv1d_conv2d_bias               (8,) (3)           
+                                                             O: conv1d_conv2d_output             (1,1,8) (27)       
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+1      permute           1    transpose    4        0        I: conv1d_conv2d_output             (1,1,8) (27)       
+                                                             O: permute_output                   (1,8,1) (29)       
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+2      backward_lstm     2    lstm         9344     4808     I: permute_output                   (1,8,1) (29)       
+                                                             S: backward_lstm_scratch0                              
+                                                             W: backward_lstm_kernel             (1,64) (4)         
+                                                             W: backward_lstm_recurrent          (16,64) (5)        
+                                                             W: backward_lstm_peephole           (1,1,1,48) (6)     
+                                                             W: backward_lstm_bias               (64,) (7)          
+                                                             W: backward_lstm_recurrent_params   (2,) (8)           
+                                                             O: backward_lstm_output0            (1,8,16) (30)      
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+3      forward_lstm      2    lstm         9344     4808     I: permute_output                   (1,8,1) (29)       
+                                                             S: forward_lstm_scratch0                               
+                                                             W: forward_lstm_kernel              (1,64) (9)         
+                                                             W: forward_lstm_recurrent           (16,64) (10)       
+                                                             W: backward_lstm_peephole           (1,1,1,48) (6)     
+                                                             W: forward_lstm_bias                (64,) (11)         
+                                                             W: backward_lstm_recurrent_params   (2,) (8)           
+                                                             O: forward_lstm_output0             (1,8,16) (31)      
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+4      bidirectional     2    concat       0        0        I: forward_lstm_output0             (1,8,16) (31)      
+                                                             I: backward_lstm_output0            (1,8,16) (30)      
+                                                             O: bidirectional_output             (1,8,32) (32)      
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+5      backward_lstm_1   3    lstm         199168   100104   I: bidirectional_output             (1,8,32) (32)      
+                                                             S: backward_lstm_1_scratch0                            
+                                                             W: backward_lstm_1_kernel           (32,256) (12)      
+                                                             W: backward_lstm_1_recurrent        (64,256) (13)      
+                                                             W: backward_lstm_1_peephole         (1,1,1,192) (14)   
+                                                             W: backward_lstm_1_bias             (256,) (15)        
+                                                             W: backward_lstm_recurrent_params   (2,) (8)           
+                                                             O: backward_lstm_1_output0          (1,8,64) (33)      
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+6      forward_lstm_1    3    lstm         199168   100104   I: bidirectional_output             (1,8,32) (32)      
+                                                             S: forward_lstm_1_scratch0                             
+                                                             W: forward_lstm_1_kernel            (32,256) (16)      
+                                                             W: forward_lstm_1_recurrent         (64,256) (17)      
+                                                             W: backward_lstm_1_peephole         (1,1,1,192) (14)   
+                                                             W: forward_lstm_1_bias              (256,) (18)        
+                                                             W: backward_lstm_recurrent_params   (2,) (8)           
+                                                             O: forward_lstm_1_output0           (1,8,64) (34)      
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+7      bidirectional_1   3    concat       0        0        I: forward_lstm_1_output0           (1,8,64) (34)      
+                                                             I: backward_lstm_1_output0          (1,8,64) (33)      
+                                                             O: bidirectional_1_output           (1,8,128) (35)     
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+8      dense_dense       5    dense        131200   524800   I: bidirectional_1_output0          (1,1024) (35)      
+                                                             W: dense_dense_weights              (1024,128) (19)    
+                                                             W: dense_dense_bias                 (128,) (20)        
+                                                             O: dense_dense_output               (1,128) (36)       
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+9      re_lu             6    nl           128      0        I: dense_dense_output               (1,128) (36)       
+                                                             O: re_lu_output                     (1,128) (0)        
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+10     dense_1_dense     7    dense        1161     4644     I: re_lu_output                     (1,128) (0)        
+                                                             W: dense_1_dense_weights            (128,9) (21)       
+                                                             W: dense_1_dense_bias               (9,) (22)          
+                                                             O: dense_1_dense_output             (1,9) (1)          
+------ ----------------- ---- ------------ -------- -------- ----------------------------------- ------------------ 
+
+
+
+Number of operations per c-layer
+------- ------ -------------------------- --------- -------------- --------- ---------- 
+c_id    m_id   name (type)                      #op           type    #param   sparsity 
+------- ------ -------------------------- --------- -------------- --------- ---------- 
+0       0      conv1d_conv2d (conv2d)        32,776   smul_f32_f32    32,776     0.0000 
+1       1      permute (transpose)                4     op_f32_f32           
+2       2      backward_lstm (lstm)           9,344   smul_f32_f32     1,202     0.0399 
+3       2      forward_lstm (lstm)            9,344   smul_f32_f32     1,202     0.0399 
+4       2      bidirectional (concat)             0     op_f32_f32           
+5       3      backward_lstm_1 (lstm)       199,168   smul_f32_f32    25,026     0.0077 
+6       3      forward_lstm_1 (lstm)        199,168   smul_f32_f32    25,026     0.0077 
+7       3      bidirectional_1 (concat)           0     op_f32_f32           
+8       5      dense_dense (dense)          131,200   smul_f32_f32   131,200     0.0000 
+9       6      re_lu (nl)                       128     op_f32_f32           
+10      7      dense_1_dense (dense)          1,161   smul_f32_f32     1,161     0.0000 
+------- ------ -------------------------- --------- -------------- --------- ---------- 
+total                                       582,293                  217,593     0.0022 
+
+Number of operation types
+---------------- --------- ----------- 
+operation type           #           % 
+---------------- --------- ----------- 
+smul_f32_f32       582,161      100.0% 
+op_f32_f32             132        0.0% 
+
+Complexity report (model)
+------ ---------------- ------------------------- ------------------------- ----------- 
+m_id   name             c_macc                    c_rom                     c_id        
+------ ---------------- ------------------------- ------------------------- ----------- 
+0      input_0          ||                 5.6%   ||||              15.1%   [0]         
+1      permute          |                  0.0%   |                  0.0%   [1]         
+2      forward_lstm     |                  3.2%   |                  1.1%   [2, 3, 4]   
+3      forward_lstm_1   ||||||||||||||||  68.4%   ||||||            23.0%   [5, 6, 7]   
+5      dense_dense      |||||             22.5%   ||||||||||||||||  60.4%   [8]         
+6      re_lu            |                  0.0%   |                  0.0%   [9]         
+7      dense_1_dense    |                  0.2%   |                  0.5%   [10]        
+------ ---------------- ------------------------- ------------------------- ----------- 
+macc=582,293 weights=869,388 act=16,416 ram_io=0
+
+Generated files (7)
+----------------------------------------------------------------------- 
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model_config.h        
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model.h               
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model.c               
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model_data_params.h   
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model_data_params.c   
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model_data.h          
+C:\Users\17832\.stm32cubemx\network_output\bilstm_model_data.c          
